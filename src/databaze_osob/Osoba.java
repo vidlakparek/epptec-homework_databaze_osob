@@ -1,5 +1,8 @@
 package databaze_osob;
 
+import java.time.LocalDate;
+import java.time.Period;
+
 /**
  * Objekt osoba.
  */
@@ -16,6 +19,10 @@ public class Osoba {
      * Privátní konstanta typu long uchovávající hodnotu rodné číslo
      */
     private final long rodneCislo;
+    /**
+     * Privátní konstanta věk
+     */
+    private final int vek;
 
     /**
      * Konstruktor objektu Osoba
@@ -28,6 +35,17 @@ public class Osoba {
         this.jmeno = jmeno;
         this.prijmeni = prijmeni;
         this.rodneCislo = rodneCislo;
+
+        LocalDate today = LocalDate.now();
+        rodneCislo /= 10000;
+        int day = (int) (rodneCislo % 100);
+        rodneCislo /= 100;
+        int month = (int) (rodneCislo % 100);
+        rodneCislo /= 100;
+        int year = (int) (rodneCislo % 100);
+        year = (year) > 22 ? 1900 + year : 2000 + year;
+        LocalDate birtDay = LocalDate.of(year, month, day);
+        this.vek = Period.between(birtDay, today).getYears();
     }
 
     /**
@@ -62,7 +80,26 @@ public class Osoba {
      *
      * @return
      */
-    public int getAge() {
-        return 0;
+    public int getVek() {
+        return vek;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Osoba osoba)) {
+            return false;
+        }
+        return this.jmeno.equals(osoba.getJmeno())
+                && this.prijmeni.equals(osoba.getPrijmeni())
+                && this.rodneCislo == osoba.getRodneCislo();
+    }
+
+    @Override
+    public String toString() {
+        return jmeno + " " + prijmeni + " s rodným číslem " + rodneCislo + ", kterému/které je " + vek;
     }
 }
