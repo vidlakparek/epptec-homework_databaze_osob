@@ -6,10 +6,11 @@ import java.util.Scanner;
 /**
  * Hlavní třída programu.
  */
+@SuppressWarnings("SqlResolve")
 public class Main {
 
     ///**
-    //* Lokální "databáze" osob
+    //* Lokální databáze osob
     //*/
     //private static final HashSet<Osoba> DB = new HashSet<>();
 
@@ -70,16 +71,28 @@ public class Main {
     private static boolean create() {
         System.out.print("Zadejte jméno: ");
         String jmeno = SC.next();
+        if (jmeno.length() < 1) {
+            System.out.println("Zadávej jméno ve správném formátu.");
+            return false;
+        }
         System.out.print("Zadejte příjmení: ");
         String prijmeni = SC.next();
-        System.out.print("Zadejte rodné číslo (bez /): ");
-        long rodneCislo = SC.nextLong();
+        if (prijmeni.length() < 1) {
+            System.out.println("Zadávej příjmení ve správném formátu.");
+            return false;
+        }
+        System.out.print("Zadejte rodné číslo: ");
+        String rodneCislo = SC.next();
+        if (rodneCislo.length() != 12) {
+            System.out.println("Zadávejte rodné číslo ve formátu RRMMDDXXXX");
+            return false;
+        }
         Osoba os = new Osoba(jmeno, prijmeni, rodneCislo);
         try {
             PreparedStatement ps = conn.prepareStatement("SELECT * FROM osoba WHERE jmeno=? AND prijmeni=? AND rodne_cislo=?");
             ps.setString(1, os.getJmeno());
             ps.setString(2, os.getPrijmeni());
-            ps.setLong(3, os.getRodneCislo());
+            ps.setString(3, os.getRodneCislo());
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 System.out.println("Osoba s danými parametry se již v databázi nachází.");
@@ -88,7 +101,7 @@ public class Main {
             ps = conn.prepareStatement("INSERT INTO osoba(jmeno, prijmeni, rodne_cislo, vek) VALUES (?,?,?,?)");
             ps.setString(1, os.getJmeno());
             ps.setString(2, os.getPrijmeni());
-            ps.setLong(3, os.getRodneCislo());
+            ps.setString(3, os.getRodneCislo());
             ps.setInt(4, os.getVek());
             ps.executeUpdate();
         } catch (SQLException e) {
@@ -104,7 +117,7 @@ public class Main {
     private static boolean delete() {
         System.out.print("Zadejte jmeno, příjmení nebo rodné číslo: ");
         String input = SC.next();
-        PreparedStatement ps = null;
+        PreparedStatement ps;
         try {
             ps = conn.prepareStatement("DELETE FROM osoba WHERE jmeno=? OR prijmeni=? OR rodne_cislo=?");
             ps.setString(1, input);
@@ -126,8 +139,8 @@ public class Main {
     private static Osoba search() {
         System.out.print("Zadejte jmeno, příjmení nebo rodné číslo: ");
         String input = SC.next();
-        PreparedStatement ps = null;
-        ResultSet rs = null;
+        PreparedStatement ps;
+        ResultSet rs;
         try {
             ps = conn.prepareStatement("SELECT * FROM osoba WHERE jmeno=? OR prijmeni=? OR rodne_cislo=?");
             ps.setString(1, input);
@@ -139,7 +152,7 @@ public class Main {
                 return null;
             }
 
-            Osoba os = new Osoba(rs.getString("jmeno"), rs.getString("prijmeni"), Long.parseLong(rs.getString("rodne_cislo")));
+            Osoba os = new Osoba(rs.getString("jmeno"), rs.getString("prijmeni"), rs.getString("rodne_cislo"));
             System.out.println(os);
         } catch (SQLException e) {
             e.printStackTrace();

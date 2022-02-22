@@ -18,7 +18,7 @@ public class Osoba {
     /**
      * Privátní konstanta typu long uchovávající hodnotu rodné číslo
      */
-    private final long rodneCislo;
+    private final String rodneCislo;
     /**
      * Privátní konstanta věk
      */
@@ -31,19 +31,16 @@ public class Osoba {
      * @param prijmeni
      * @param rodneCislo
      */
-    public Osoba(String jmeno, String prijmeni, long rodneCislo) {
+    public Osoba(String jmeno, String prijmeni, String rodneCislo) {
         this.jmeno = jmeno;
         this.prijmeni = prijmeni;
         this.rodneCislo = rodneCislo;
 
         LocalDate today = LocalDate.now();
-        rodneCislo /= 10000;
-        int day = (int) (rodneCislo % 100);
-        rodneCislo /= 100;
-        int month = (int) (rodneCislo % 100);
+        int day = Integer.parseInt(rodneCislo.charAt(4) + rodneCislo.charAt(5) + "");
+        int month = Integer.parseInt(rodneCislo.charAt(2) + rodneCislo.charAt(3) + "");
         if (month > 12) month -= 50;
-        rodneCislo /= 100;
-        int year = (int) (rodneCislo % 100);
+        int year = Integer.parseInt(rodneCislo.charAt(0) + rodneCislo.charAt(1) + "");
         year = (year) > 22 ? 1900 + year : 2000 + year;
         LocalDate birtDay = LocalDate.of(year, month, day);
         this.vek = Period.between(birtDay, today).getYears();
@@ -72,7 +69,7 @@ public class Osoba {
      *
      * @return
      */
-    public long getRodneCislo() {
+    public String getRodneCislo() {
         return rodneCislo;
     }
 
@@ -85,19 +82,19 @@ public class Osoba {
         return vek;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o == this) {
-            return true;
-        }
-
-        if (!(o instanceof Osoba osoba)) {
-            return false;
-        }
-        return this.jmeno.equals(osoba.getJmeno())
-                && this.prijmeni.equals(osoba.getPrijmeni())
-                && this.rodneCislo == osoba.getRodneCislo();
-    }
+//    @Override
+//    public boolean equals(Object o) {
+//        if (o == this) {
+//            return true;
+//        }
+//
+//        if (!(o instanceof Osoba osoba)) {
+//            return false;
+//        }
+//        return this.jmeno.equals(osoba.getJmeno())
+//                && this.prijmeni.equals(osoba.getPrijmeni())
+//                && this.rodneCislo == osoba.getRodneCislo();
+//    }
 
     @Override
     public String toString() {
