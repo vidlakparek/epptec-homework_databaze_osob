@@ -83,7 +83,7 @@ public class Main {
         }
         System.out.print("Zadejte rodné číslo: ");
         String rodneCislo = SC.next();
-        if (rodneCislo.length() != 12) {
+        if (rodneCislo.length() != 10) {
             System.out.println("Zadávejte rodné číslo ve formátu RRMMDDXXXX");
             return false;
         }

@@ -37,10 +37,10 @@ public class Osoba {
         this.rodneCislo = rodneCislo;
 
         LocalDate today = LocalDate.now();
-        int day = Integer.parseInt(rodneCislo.charAt(4) + rodneCislo.charAt(5) + "");
-        int month = Integer.parseInt(rodneCislo.charAt(2) + rodneCislo.charAt(3) + "");
+        int day = rodneCislo.charAt(4)-47 + rodneCislo.charAt(5)-47;
+        int month = rodneCislo.charAt(2)-47 + rodneCislo.charAt(3)-47;
         if (month > 12) month -= 50;
-        int year = Integer.parseInt(rodneCislo.charAt(0) + rodneCislo.charAt(1) + "");
+        int year = rodneCislo.charAt(0)-47 + rodneCislo.charAt(1)-47;
         year = (year) > 22 ? 1900 + year : 2000 + year;
         LocalDate birtDay = LocalDate.of(year, month, day);
         this.vek = Period.between(birtDay, today).getYears();
