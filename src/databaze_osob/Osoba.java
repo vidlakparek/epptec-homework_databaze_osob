@@ -41,6 +41,7 @@ public class Osoba {
         int day = (int) (rodneCislo % 100);
         rodneCislo /= 100;
         int month = (int) (rodneCislo % 100);
+        if (month > 12) month -= 50;
         rodneCislo /= 100;
         int year = (int) (rodneCislo % 100);
         year = (year) > 22 ? 1900 + year : 2000 + year;

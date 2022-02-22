@@ -1,20 +1,43 @@
 package databaze_osob;
 
-import java.util.HashSet;
+import java.sql.*;
 import java.util.Scanner;
 
 /**
  * Hlavní třída programu.
  */
 public class Main {
-    /**
-     * Lokální "databáze" osob
-     */
-    private static final HashSet<Osoba> DB = new HashSet<>();
+
+    ///**
+    //* Lokální "databáze" osob
+    //*/
+    //private static final HashSet<Osoba> DB = new HashSet<>();
+
     /**
      * Pomocný objekt Scanner pro čtení vstupů
      */
     private static final Scanner SC = new Scanner(System.in);
+
+    /**
+     * Vytvoření spojení k SQLite databázi
+     */
+    private static Connection conn;
+
+    static {
+        try {
+            conn = DriverManager.getConnection("jdbc:sqlite:databaze_osob.db");
+            Statement stmt = conn.createStatement();
+            stmt.execute("CREATE TABLE IF NOT EXISTS osoba("
+                    + "id integer PRIMARY KEY NOT NULL, "
+                    + "jmeno text NOT NULL, "
+                    + "prijmeni text NOT NULL, "
+                    + "rodne_cislo text NOT NULL, "
+                    + "vek text NOT NULL"
+                    + ");");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     /**
      * Zaváděcí metoda programu
@@ -22,6 +45,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
+
         do {
             System.out.println("""
                     1 -> Přidat osobu
@@ -50,7 +74,27 @@ public class Main {
         String prijmeni = SC.next();
         System.out.print("Zadejte rodné číslo (bez /): ");
         long rodneCislo = SC.nextLong();
-        DB.add(new Osoba(jmeno, prijmeni, rodneCislo));
+        Osoba os = new Osoba(jmeno, prijmeni, rodneCislo);
+        try {
+            PreparedStatement ps = conn.prepareStatement("SELECT * FROM osoba WHERE jmeno=? AND prijmeni=? AND rodne_cislo=?");
+            ps.setString(1, os.getJmeno());
+            ps.setString(2, os.getPrijmeni());
+            ps.setLong(3, os.getRodneCislo());
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                System.out.println("Osoba s danými parametry se již v databázi nachází.");
+                return false;
+            }
+            ps = conn.prepareStatement("INSERT INTO osoba(jmeno, prijmeni, rodne_cislo, vek) VALUES (?,?,?,?)");
+            ps.setString(1, os.getJmeno());
+            ps.setString(2, os.getPrijmeni());
+            ps.setLong(3, os.getRodneCislo());
+            ps.setInt(4, os.getVek());
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        //DB.add(new Osoba(jmeno, prijmeni, rodneCislo));
         return true;
     }
 
@@ -60,9 +104,19 @@ public class Main {
     private static boolean delete() {
         System.out.print("Zadejte jmeno, příjmení nebo rodné číslo: ");
         String input = SC.next();
-        DB.removeIf(osoba -> osoba.getJmeno().equals(input)
+        PreparedStatement ps = null;
+        try {
+            ps = conn.prepareStatement("DELETE FROM osoba WHERE jmeno=? OR prijmeni=? OR rodne_cislo=?");
+            ps.setString(1, input);
+            ps.setString(2, input);
+            ps.setString(3, input);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        /*DB.removeIf(osoba -> osoba.getJmeno().equals(input)
                 || osoba.getPrijmeni().equals(input)
-                || Long.parseLong(input) == osoba.getRodneCislo());
+                || Long.parseLong(input) == osoba.getRodneCislo());*/
         return true;
     }
 
@@ -72,7 +126,25 @@ public class Main {
     private static Osoba search() {
         System.out.print("Zadejte jmeno, příjmení nebo rodné číslo: ");
         String input = SC.next();
-        for (Osoba osoba : DB) {
+        PreparedStatement ps = null;
+        ResultSet rs = null;
+        try {
+            ps = conn.prepareStatement("SELECT * FROM osoba WHERE jmeno=? OR prijmeni=? OR rodne_cislo=?");
+            ps.setString(1, input);
+            ps.setString(2, input);
+            ps.setString(3, input);
+            rs = ps.executeQuery();
+            if (!rs.next()) {
+                System.out.println("Osoba se nenechází v databázi");
+                return null;
+            }
+
+            Osoba os = new Osoba(rs.getString("jmeno"), rs.getString("prijmeni"), Long.parseLong(rs.getString("rodne_cislo")));
+            System.out.println(os);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        /* for (Osoba osoba : DB) {
             if (osoba.getJmeno().equals(input)
                     || osoba.getPrijmeni().equals(input)
                     || Long.parseLong(input) == osoba.getRodneCislo()) {
@@ -80,7 +152,7 @@ public class Main {
                 return osoba;
             }
             System.out.println("Osoba se nenechází v databázi");
-        }
+        }*/
         return null;
     }
 }
