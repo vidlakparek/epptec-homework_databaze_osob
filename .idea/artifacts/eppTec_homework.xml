@@ -1,0 +1,14 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="eppTec-homework">
+    <output-path>$PROJECT_DIR$</output-path>
+    <root id="archive" name="eppTec-homework.jar">
+      <element id="directory" name="src">
+        <element id="module-source" name="epptec - homework databáze osob" />
+      </element>
+      <element id="module-output" name="epptec - homework databáze osob" />
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/META-INF/MANIFEST.MF" />
+      </element>
+    </root>
+  </artifact>
+</component>

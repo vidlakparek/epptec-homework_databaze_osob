@@ -31,16 +31,18 @@ public class Osoba {
      * @param prijmeni
      * @param rodneCislo
      */
-    public Osoba(String jmeno, String prijmeni, String rodneCislo) {
+    public Osoba(final String jmeno, final String prijmeni, final String rodneCislo) {
         this.jmeno = jmeno;
         this.prijmeni = prijmeni;
         this.rodneCislo = rodneCislo;
 
         LocalDate today = LocalDate.now();
-        int day = rodneCislo.charAt(4)-47 + rodneCislo.charAt(5)-47;
-        int month = rodneCislo.charAt(2)-47 + rodneCislo.charAt(3)-47;
-        if (month > 12) month -= 50;
-        int year = rodneCislo.charAt(0)-47 + rodneCislo.charAt(1)-47;
+        int day = (rodneCislo.charAt(4) - '0') * 10 + (rodneCislo.charAt(5) - '0');
+        int month = (rodneCislo.charAt(2) - '0') * 10 + rodneCislo.charAt(3) - '0';
+        if (month > 12) {
+            month -= 50;
+        }
+        int year = (rodneCislo.charAt(0) - '0') * 10 + rodneCislo.charAt(1) - '0';
         year = (year) > 22 ? 1900 + year : 2000 + year;
         LocalDate birtDay = LocalDate.of(year, month, day);
         this.vek = Period.between(birtDay, today).getYears();
@@ -82,19 +84,19 @@ public class Osoba {
         return vek;
     }
 
-//    @Override
-//    public boolean equals(Object o) {
-//        if (o == this) {
-//            return true;
-//        }
-//
-//        if (!(o instanceof Osoba osoba)) {
-//            return false;
-//        }
-//        return this.jmeno.equals(osoba.getJmeno())
-//                && this.prijmeni.equals(osoba.getPrijmeni())
-//                && this.rodneCislo == osoba.getRodneCislo();
-//    }
+    @Override
+    public boolean equals(Object o) {
+        if (o == this) {
+            return true;
+        }
+
+        if (!(o instanceof Osoba osoba)) {
+            return false;
+        }
+        return this.jmeno.equals(osoba.getJmeno())
+                && this.prijmeni.equals(osoba.getPrijmeni())
+                && this.rodneCislo.equals(osoba.getRodneCislo());
+    }
 
     @Override
     public String toString() {
